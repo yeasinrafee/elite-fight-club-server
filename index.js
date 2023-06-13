@@ -25,11 +25,19 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    const userCollection = client.db("fightDb").collection("users");
     const classCollection = client.db("fightDb").collection("classes");
     const instructorCollection = client.db("fightDb").collection("instructors");
     const testimonialsCollection = client
       .db("fightDb")
       .collection("testimonials");
+
+    // For Users
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await userCollection.insertOne(user);
+      res.send(result);
+    });
 
     // For Classes
     app.get("/classes", async (req, res) => {
