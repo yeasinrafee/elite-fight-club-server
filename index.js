@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 const port = process.env.PORT || 5000;
 
 // middleware
@@ -31,6 +32,14 @@ async function run() {
     const testimonialsCollection = client
       .db("fightDb")
       .collection("testimonials");
+
+    app.post("/jwt", (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "1h",
+      });
+      res.send({ token });
+    });
 
     // For Users
     app.get("/users", async (req, res) => {
@@ -97,6 +106,12 @@ async function run() {
         },
       };
       const result = await classCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+    app.patch("/classes/feedback/:id", async (req, res) => {
+      const id = req.params.id;
+      const feedback = req.body;
+      console.log(feedback);
       res.send(result);
     });
 
