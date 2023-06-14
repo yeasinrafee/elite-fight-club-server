@@ -182,6 +182,19 @@ async function run() {
       const result = { instructor: user?.role === "instructor" };
       res.send(result);
     });
+    // Add A Class
+    app.post("/addClass", async (req, res) => {
+      const aClass = req.body;
+      const result = await classCollection.insertOne(aClass);
+      res.send(result);
+    });
+
+    app.get("/classes/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { instructor_email: email };
+      const result = await classCollection.find(query).toArray();
+      res.send(result);
+    });
 
     // For testimonials
     app.get("/testimonials", async (req, res) => {
