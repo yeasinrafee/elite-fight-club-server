@@ -54,6 +54,7 @@ async function run() {
       .db("fightDb")
       .collection("testimonials");
 
+    // JWT
     app.post("/jwt", (req, res) => {
       const user = req.body;
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
@@ -62,8 +63,20 @@ async function run() {
       res.send({ token });
     });
 
+    const verifyAdmin = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      if (user?.role !== "admin") {
+        return res
+          .status(403)
+          .send({ error: true, message: "forbidden message" });
+      }
+      next();
+    };
+
     // For Users
-    app.get("/users", verifyJWT, async (req, res) => {
+    app.get("/users", verifyJWT, verifyAdmin, async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     });
@@ -154,6 +167,19 @@ async function run() {
     // For instructor
     app.get("/instructors", async (req, res) => {
       const result = await instructorCollection.find().toArray();
+      res.send(result);
+    });
+    // Checking Instructor or not
+    app.get("/users/instructor/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+
+      if (req.decoded.email !== email) {
+        res.send({ instructor: false });
+      }
+
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      const result = { instructor: user?.role === "instructor" };
       res.send(result);
     });
 
