@@ -84,6 +84,15 @@ async function run() {
       const result = await selectedClassCollection.insertOne(item);
       res.send(result);
     });
+    app.get("/selected", async (req, res) => {
+      const email = req.query.email;
+      if (!email) {
+        res.send([]);
+      }
+      const query = { email: email };
+      const result = await selectedClassCollection.find(query).toArray();
+      res.send(result);
+    });
 
     // For Users
     app.get("/users", verifyJWT, verifyAdmin, async (req, res) => {
