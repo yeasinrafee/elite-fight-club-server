@@ -3,6 +3,7 @@ const app = express();
 const cors = require("cors");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
 const port = process.env.PORT || 5000;
 
 // middleware
@@ -239,6 +240,21 @@ async function run() {
     app.get("/testimonials", async (req, res) => {
       const result = await testimonialsCollection.find().toArray();
       res.send(result);
+    });
+
+    // Create Payment Intent
+    app.post("/create-payment-intent", verifyJWT, async (req, res) => {
+      const { classPrice } = req.body;
+      const amount = parseInt(classPrice * 100);
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd",
+        payment_method_types: ["card"],
+      });
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
     });
 
     // Send a ping to confirm a successful connection
