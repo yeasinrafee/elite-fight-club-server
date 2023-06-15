@@ -49,6 +49,9 @@ async function run() {
 
     const userCollection = client.db("fightDb").collection("users");
     const classCollection = client.db("fightDb").collection("classes");
+    const selectedClassCollection = client
+      .db("fightDb")
+      .collection("selectClasses");
     const instructorCollection = client.db("fightDb").collection("instructors");
     const testimonialsCollection = client
       .db("fightDb")
@@ -74,6 +77,13 @@ async function run() {
       }
       next();
     };
+
+    // Selected Class collection:
+    app.post("/selected", async (req, res) => {
+      const item = req.body;
+      const result = await selectedClassCollection.insertOne(item);
+      res.send(result);
+    });
 
     // For Users
     app.get("/users", verifyJWT, verifyAdmin, async (req, res) => {
