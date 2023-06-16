@@ -50,6 +50,7 @@ async function run() {
 
     const userCollection = client.db("fightDb").collection("users");
     const classCollection = client.db("fightDb").collection("classes");
+    const paymentCollection = client.db("fightDb").collection("payments");
     const selectedClassCollection = client
       .db("fightDb")
       .collection("selectClasses");
@@ -255,6 +256,20 @@ async function run() {
       res.send({
         clientSecret: paymentIntent.client_secret,
       });
+    });
+
+    // Payment apis
+    app.post("/payments", async (req, res) => {
+      const payment = req.body;
+      const result = await paymentCollection.insertOne(payment);
+      res.send(result);
+    });
+
+    app.get("/classes/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await classCollection.findOne(query);
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
