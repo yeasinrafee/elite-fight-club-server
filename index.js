@@ -136,7 +136,6 @@ async function run() {
     // Checking Admin or not
     app.get("/users/admin/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
-
       if (req.decoded.email !== email) {
         res.send({ admin: false });
       }
@@ -144,6 +143,20 @@ async function run() {
       const query = { email: email };
       const user = await userCollection.findOne(query);
       const result = { admin: user?.role === "admin" };
+      res.send(result);
+    });
+
+    // Update Feedback
+    app.patch("/classes/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const { feedback } = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          feedback: feedback,
+        },
+      };
+      const result = await classCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
 
@@ -266,6 +279,18 @@ async function run() {
       const query = { _id: new ObjectId(payment.selectedClassId) };
       const deleteResult = await selectedClassCollection.deleteOne(query);
       res.send({ insertedResult, deleteResult });
+    });
+
+    app.get("/payments", async (req, res) => {
+      const result = await paymentCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/payments/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await paymentCollection.find(query).toArray();
+      res.send(result);
     });
 
     app.get("/selected/:id", async (req, res) => {
