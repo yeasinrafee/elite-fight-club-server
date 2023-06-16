@@ -259,16 +259,19 @@ async function run() {
     });
 
     // Payment apis
-    app.post("/payments", async (req, res) => {
+    app.post("/payments", verifyJWT, async (req, res) => {
       const payment = req.body;
-      const result = await paymentCollection.insertOne(payment);
-      res.send(result);
+      const insertedResult = await paymentCollection.insertOne(payment);
+
+      const query = { _id: new ObjectId(payment.selectedClassId) };
+      const deleteResult = await selectedClassCollection.deleteOne(query);
+      res.send({ insertedResult, deleteResult });
     });
 
-    app.get("/classes/:id", async (req, res) => {
+    app.get("/selected/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      const result = await classCollection.findOne(query);
+      const result = await selectedClassCollection.findOne(query);
       res.send(result);
     });
 
