@@ -185,7 +185,12 @@ async function run() {
 
     // For Classes
     app.get("/classes", async (req, res) => {
-      const result = await classCollection.find().toArray();
+      const result = await classCollection
+        .find()
+        .sort({
+          number_of_students: -1,
+        })
+        .toArray();
       res.send(result);
     });
 
