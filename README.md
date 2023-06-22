@@ -1,5 +1,4 @@
-# b7a12-summer-camp-server_side-yeasinrafee
-b7a12-summer-camp-server_side-yeasinrafee created by GitHub Classroom
+# EliteFightClub Server
 
 ## Complete Project
 
